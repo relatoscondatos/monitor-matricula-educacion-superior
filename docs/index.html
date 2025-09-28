@@ -238,6 +238,7 @@
     2935,
     2973,
     3247,
+    4163,
     4982,
     5084,
     5570,
@@ -319,6 +320,12 @@
       (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/3247/NEM_y_Percentil_Jovenes_3247.parquet'
       WHERE RBD = 3247
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4163/NEM_y_Percentil_Jovenes_4163.parquet'
+      WHERE RBD = 4163
       )
       UNION ALL
 
@@ -515,6 +522,11 @@
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/3247/Matricula_Ed_Superior_3247.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4163/Matricula_Ed_Superior_4163.parquet')
 
       UNION ALL
 
