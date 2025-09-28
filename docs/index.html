@@ -32,7 +32,7 @@
   <script id="17" type="text/x-typescript">
     const selectRBD = view(
       Inputs.select(
-        [...new Set(data_multiple_rbds.map(d => d.rbd))].sort(),
+        _.sortBy([...new Set(data_multiple_rbds.map(d => d.rbd))], d => dictEstablecimientos[d].NOM_RBD),
         {
           label: "RBD:",
           value: 8888,
@@ -224,23 +224,38 @@
 
     *Esta sección documenta el proceso completo desde la extracción de datos hasta la generación de visualizaciones, asegurando la transparencia y reproducibilidad del análisis.*
   </script>
-  <script id="35" type="text/x-typescript" pinned="">
+  <script id="35" type="text/x-typescript">
     const establecimientosSeleccionados = [
+    2973,
     5666,
+    5570,
     8473,
     8485,
     8487,
     8862,
     8888,
     8906,
+    8928,
     9046,
     25654]; // Add more RBDs as needed
   </script>
   <script id="12" type="application/sql" hidden="" database="duckdb" output="data_multiple_rbds">
     WITH estudiantes_rbd AS (
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2973/NEM_y_Percentil_Jovenes_2973.parquet'
+      WHERE RBD = 2973
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5666/NEM_y_Percentil_Jovenes_5666.parquet'
       WHERE RBD = 5666
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5570/NEM_y_Percentil_Jovenes_5570.parquet'
+      WHERE RBD = 5570
       )
       UNION ALL
 
@@ -281,6 +296,12 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8928/NEM_y_Percentil_Jovenes_8928.parquet'
+      WHERE RBD = 8928
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/9046/NEM_y_Percentil_Jovenes_9046.parquet'
       WHERE RBD = 9046
       )
@@ -294,7 +315,17 @@
 
     matriculas_rbd AS (
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2973/Matricula_Ed_Superior_2973.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5666/Matricula_Ed_Superior_5666.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5570/Matricula_Ed_Superior_5570.parquet')
 
       UNION ALL
 
@@ -325,6 +356,11 @@
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8906/Matricula_Ed_Superior_8906.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8928/Matricula_Ed_Superior_8928.parquet')
 
       UNION ALL
 
@@ -420,6 +456,9 @@
       AND df.nomb_inst = ri.nomb_inst
     ORDER BY df.rbd, df.agno_egreso, df.percentil, df.estudiantes DESC
   </script>
+  <script id="45" type="text/x-typescript" hidden="">
+    sqlForSelected.fullCTE
+  </script>
   <script id="44" type="module">
     // Helper function to generate SQL UNION statements for multiple RBDs
     function generateUnionSQL(rbds, baseUrl = 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main') {
@@ -464,7 +503,7 @@
     // You can also use it with your establecimientosSeleccionados array
     //display("\nUsing establecimientosSeleccionados:");
     const sqlForSelected = generateUnionSQL(establecimientosSeleccionados);
-    display(sqlForSelected.fullCTE);
+
   </script>
   <script id="24" type="module">
     function getTopInstitutionsForLowPercentiles(rbd, agno_egreso, minPercentile = 0, maxPercentile = 30, majorityThreshold = 66) {
@@ -666,9 +705,6 @@
     const dictEstablecimientos = {};
     [...establecimientos].forEach(d => dictEstablecimientos[d.RBD] = d);
 
-  </script>
-  <script id="42" type="text/x-typescript" pinned="">
-    display(dictEstablecimientos)
   </script>
   <script id="29" type="text/html">
     <style>
