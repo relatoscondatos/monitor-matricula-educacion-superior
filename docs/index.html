@@ -226,21 +226,70 @@
   </script>
   <script id="35" type="text/x-typescript">
     const establecimientosSeleccionados = [
+    4,
+    52,
+    2110,
+    2200,
+    2935,
     2973,
-    5666,
+    3247,
+    4982,
     5570,
+    5666,
     8473,
     8485,
     8487,
+    8748,
+    8757,
     8862,
+    8877,
     8888,
     8906,
+    8917,
     8928,
+    8979,
+    8995,
+    8996,
     9046,
-    25654]; // Add more RBDs as needed
+    9267,
+    25369,
+    25645,
+    25654
+    ]; // Add more RBDs as needed
   </script>
   <script id="12" type="application/sql" hidden="" database="duckdb" output="data_multiple_rbds">
+
     WITH estudiantes_rbd AS (
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4/NEM_y_Percentil_Jovenes_4.parquet'
+      WHERE RBD = 4
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/52/NEM_y_Percentil_Jovenes_52.parquet'
+      WHERE RBD = 52
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2110/NEM_y_Percentil_Jovenes_2110.parquet'
+      WHERE RBD = 2110
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2200/NEM_y_Percentil_Jovenes_2200.parquet'
+      WHERE RBD = 2200
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2935/NEM_y_Percentil_Jovenes_2935.parquet'
+      WHERE RBD = 2935
+      )
+      UNION ALL
+
       (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2973/NEM_y_Percentil_Jovenes_2973.parquet'
       WHERE RBD = 2973
@@ -248,14 +297,26 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
-      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5666/NEM_y_Percentil_Jovenes_5666.parquet'
-      WHERE RBD = 5666
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/3247/NEM_y_Percentil_Jovenes_3247.parquet'
+      WHERE RBD = 3247
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4982/NEM_y_Percentil_Jovenes_4982.parquet'
+      WHERE RBD = 4982
       )
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5570/NEM_y_Percentil_Jovenes_5570.parquet'
       WHERE RBD = 5570
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5666/NEM_y_Percentil_Jovenes_5666.parquet'
+      WHERE RBD = 5666
       )
       UNION ALL
 
@@ -278,8 +339,26 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8748/NEM_y_Percentil_Jovenes_8748.parquet'
+      WHERE RBD = 8748
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8757/NEM_y_Percentil_Jovenes_8757.parquet'
+      WHERE RBD = 8757
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8862/NEM_y_Percentil_Jovenes_8862.parquet'
       WHERE RBD = 8862
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8877/NEM_y_Percentil_Jovenes_8877.parquet'
+      WHERE RBD = 8877
       )
       UNION ALL
 
@@ -296,14 +375,56 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8917/NEM_y_Percentil_Jovenes_8917.parquet'
+      WHERE RBD = 8917
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8928/NEM_y_Percentil_Jovenes_8928.parquet'
       WHERE RBD = 8928
       )
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8979/NEM_y_Percentil_Jovenes_8979.parquet'
+      WHERE RBD = 8979
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8995/NEM_y_Percentil_Jovenes_8995.parquet'
+      WHERE RBD = 8995
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8996/NEM_y_Percentil_Jovenes_8996.parquet'
+      WHERE RBD = 8996
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/9046/NEM_y_Percentil_Jovenes_9046.parquet'
       WHERE RBD = 9046
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/9267/NEM_y_Percentil_Jovenes_9267.parquet'
+      WHERE RBD = 9267
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25369/NEM_y_Percentil_Jovenes_25369.parquet'
+      WHERE RBD = 25369
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25645/NEM_y_Percentil_Jovenes_25645.parquet'
+      WHERE RBD = 25645
       )
       UNION ALL
 
@@ -315,17 +436,52 @@
 
     matriculas_rbd AS (
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4/Matricula_Ed_Superior_4.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/52/Matricula_Ed_Superior_52.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2110/Matricula_Ed_Superior_2110.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2200/Matricula_Ed_Superior_2200.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2935/Matricula_Ed_Superior_2935.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2973/Matricula_Ed_Superior_2973.parquet')
 
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
-      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5666/Matricula_Ed_Superior_5666.parquet')
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/3247/Matricula_Ed_Superior_3247.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4982/Matricula_Ed_Superior_4982.parquet')
 
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5570/Matricula_Ed_Superior_5570.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5666/Matricula_Ed_Superior_5666.parquet')
 
       UNION ALL
 
@@ -345,7 +501,22 @@
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8748/Matricula_Ed_Superior_8748.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8757/Matricula_Ed_Superior_8757.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8862/Matricula_Ed_Superior_8862.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8877/Matricula_Ed_Superior_8877.parquet')
 
       UNION ALL
 
@@ -360,12 +531,47 @@
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8917/Matricula_Ed_Superior_8917.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8928/Matricula_Ed_Superior_8928.parquet')
 
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8979/Matricula_Ed_Superior_8979.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8995/Matricula_Ed_Superior_8995.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/8996/Matricula_Ed_Superior_8996.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/9046/Matricula_Ed_Superior_9046.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/9267/Matricula_Ed_Superior_9267.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25369/Matricula_Ed_Superior_25369.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25645/Matricula_Ed_Superior_25645.parquet')
 
       UNION ALL
 
@@ -456,8 +662,46 @@
       AND df.nomb_inst = ri.nomb_inst
     ORDER BY df.rbd, df.agno_egreso, df.percentil, df.estudiantes DESC
   </script>
-  <script id="45" type="text/x-typescript" hidden="">
-    sqlForSelected.fullCTE
+  <script id="45" type="module">
+    const sqlQuery = sqlForSelected.queryCompleta;
+
+    // Create a container with the query text and copy button
+    const container = htl.html`<div style="border: 1px solid #ddd; border-radius: 4px; padding: 15px; background-color: #f8f9fa;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h4 style="margin: 0; color: #495057;">SQL Query Completa</h4>
+        <button id="copyButton" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+          📋 Copy to Clipboard
+        </button>
+      </div>
+      <!--
+      <pre style="background-color: white; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; line-height: 1.4; margin: 0; border: 1px solid #e9ecef;"><code>${sqlQuery}</code></pre>
+      -->
+    </div>`;
+
+    // Add click event listener to the copy button
+    container.querySelector('#copyButton').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(sqlQuery);
+
+        // Visual feedback
+        const button = container.querySelector('#copyButton');
+        const originalText = button.textContent;
+        button.textContent = '✅ Copied!';
+        button.style.background = '#28a745';
+
+        // Reset button after 2 seconds
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.background = '#007bff';
+        }, 2000);
+
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+        alert('Failed to copy to clipboard. Please copy manually.');
+      }
+    });
+
+    display(container);
   </script>
   <script id="44" type="module">
     // Helper function to generate SQL UNION statements for multiple RBDs
@@ -482,7 +726,95 @@
       return {
         estudiantesRbd: `WITH estudiantes_rbd AS (\n${estudiantesUnions}\n),`,
         matriculasRbd: `\nmatriculas_rbd AS (\n${matriculasUnions}\n),`,
-        fullCTE: `WITH estudiantes_rbd AS (\n${estudiantesUnions}\n),\n\nmatriculas_rbd AS (\n${matriculasUnions}\n),`
+        fullCTE: `WITH estudiantes_rbd AS (\n${estudiantesUnions}\n),\n\nmatriculas_rbd AS (\n${matriculasUnions}\n),`,
+
+        queryCompleta: `
+    WITH estudiantes_rbd AS (\n${estudiantesUnions}\n),\n\nmatriculas_rbd AS (\n${matriculasUnions}\n),
+
+    matriculas_con_percentil AS (
+      SELECT
+        nem.rbd,
+        nem.mrun,
+        agno_egreso,
+        percentil::INT AS percentil,
+        cat_periodo,
+        nomb_inst
+      FROM estudiantes_rbd nem
+      JOIN matriculas_rbd es
+        ON nem.mrun = es.mrun
+    ),
+
+    primera_matricula_por_estudiante AS (
+      SELECT
+        rbd,
+        mrun,
+        percentil,
+        agno_egreso,
+        MIN(cat_periodo) AS cat_periodo,
+        FIRST(nomb_inst ORDER BY cat_periodo) AS nomb_inst
+      FROM matriculas_con_percentil
+      GROUP BY rbd, mrun, percentil, agno_egreso
+    ),
+
+    -- Calcular ranking de todas las instituciones por año y RBD (basado en total de estudiantes)
+    ranking_instituciones AS (
+      SELECT
+        rbd,
+        agno_egreso,
+        nomb_inst,
+        COUNT(*) AS total_estudiantes,
+        ROW_NUMBER() OVER (PARTITION BY rbd, agno_egreso ORDER BY COUNT(*) DESC) AS ranking_inst
+      FROM primera_matricula_por_estudiante
+      GROUP BY rbd, agno_egreso, nomb_inst
+    ),
+
+    -- Calcular top 5 instituciones por año y RBD para percentiles <= 30
+    top5_por_año AS (
+      SELECT
+        rbd,
+        agno_egreso,
+        nomb_inst,
+        SUM(CASE WHEN percentil <= 30 THEN 1 ELSE 0 END) AS estudiantes_top_deciles,
+        ROW_NUMBER() OVER (PARTITION BY rbd, agno_egreso ORDER BY SUM(CASE WHEN percentil <= 30 THEN 1 ELSE 0 END) DESC) AS ranking_top_deciles
+      FROM primera_matricula_por_estudiante
+      GROUP BY rbd, agno_egreso, nomb_inst
+    ),
+
+    instituciones_top5 AS (
+      SELECT
+        rbd,
+        agno_egreso,
+        nomb_inst
+      FROM top5_por_año
+      WHERE ranking_top_deciles <= 5
+    ),
+
+    datos_finales AS (
+      SELECT
+        rbd,
+        agno_egreso,
+        percentil,
+        nomb_inst,
+        COUNT(*) AS estudiantes
+      FROM primera_matricula_por_estudiante
+      GROUP BY rbd, agno_egreso, percentil, nomb_inst
+    )
+
+    SELECT
+      df.rbd,
+      df.agno_egreso,
+      df.percentil,
+      df.nomb_inst,
+      df.estudiantes,
+      ri.ranking_inst
+    FROM datos_finales df
+    LEFT JOIN ranking_instituciones ri
+      ON df.rbd = ri.rbd
+      AND df.agno_egreso = ri.agno_egreso
+      AND df.nomb_inst = ri.nomb_inst
+    ORDER BY df.rbd, df.agno_egreso, df.percentil, df.estudiantes DESC`
+
+
       };
     }
 
@@ -687,8 +1019,8 @@
       downloadCSV(data_multiple_rbds, 'data_multiple_rbds.csv');
     };
 
-    //display(downloadButton);
-    //display(`Dataset contains ${data_multiple_rbds.length} rows`);
+    display(downloadButton);
+    display(`Dataset contains ${data_multiple_rbds.length} rows`);
   </script>
   <script id="37" type="text/x-typescript">
     const dbDirectorio = await DuckDBClient.of({
