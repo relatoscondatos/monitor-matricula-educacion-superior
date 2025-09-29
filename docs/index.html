@@ -192,7 +192,7 @@
     <div class="performance-segments">
       <div class="segment-column high-performance">
         <div class="segment-header">
-          <h4>🏆 Mayor Rendimiento</h4>
+          <h4>Mayor Rendimiento</h4>
           <span class="percentile-range">Percentiles 10-30</span>
         </div>
         <div class="institutions-list">
@@ -202,7 +202,7 @@
 
       <div class="segment-column medium-performance">
         <div class="segment-header">
-          <h4>📊 Rendimiento Intermedio</h4>
+          <h4>Rendimiento Intermedio</h4>
           <span class="percentile-range">Percentiles 40-70</span>
         </div>
         <div class="institutions-list">
@@ -212,7 +212,7 @@
 
       <div class="segment-column low-performance">
         <div class="segment-header">
-          <h4>📈 Menor Rendimiento</h4>
+          <h4>Menor Rendimiento</h4>
           <span class="percentile-range">Percentiles 80-100</span>
         </div>
         <div class="institutions-list">
@@ -222,16 +222,6 @@
     </div>
 
     </div>`);
-  </script>
-  <script id="63" type="text/markdown">
-
-        ## Análisis por Segmentos de Rendimiento
-
-        **Establecimiento: ${dictEstablecimientos[selectRBD].NOM_RBD} (${dictEstablecimientos[selectRBD].NOM_COM_RBD}) - RBD: ${selectRBD} | Año de Egreso: ${selectAño}**
-
-        ${generateInstitutionSummaryMD(selectRBD, selectAño)}
-
-        </div>
   </script>
   <script id="14" type="text/x-typescript">
     const dataPlot = data_multiple_rbds.filter(d => d.rbd == selectRBD &&  d.agno_egreso == selectAño);
@@ -1274,32 +1264,7 @@
 
     //display(result);
   </script>
-  <script id="65" type="text/x-typescript" pinned="">
-    const items = ["Apples", "Pears", "Berries"];
-    const segData = getTopInstitutionsForLowPercentiles(8888, 2023, 10, 30);
-    const myHtml = html`<ul>${segData.majority_institutions.map(d => html`<li>${d.institution}</li>`)}</ul>`
-    display(segData)
-    display(html`<ul>${segData.majority_institutions.map(d => html`<li>${d.institution}</li>`)}${myHtml}</ul>`)
-    display(segData)
-
-  </script>
-  <script id="64" type="text/x-typescript" pinned="">
-    const a = `<h1>Test</h1>`
-    display(html`${generateInstitutionListHTML(8888, 2022, 10, 30)}`)
-    const a2 = html`<h1>Test</h1>`;
-    display(html`${a2}`);
-      display(generateInstitutionListHTML(8888, 2022, 10, 30))
-    display([1,1,1,1])
-    display(html`${generateInstitutionListHTML(8888, 2022, 10, 30)}`)
-    display(html`${generateInstitutionListHTML(8888, 2022, 10, 30)}`)
-  </script>
-  <script id="66" type="text/html" pinned="">
-    ${html`${generateInstitutionListHTML(8888, 2022, 10, 30)}`}
-    display([1,1,1,1])
-    display(html`${generateInstitutionListHTML(8888, 2022, 10, 30)}`)
-    display(html`${generateInstitutionListHTML(8888, 2022, 10, 30)}`)
-  </script>
-  <script id="58" type="module" pinned="">
+  <script id="58" type="module">
     // Function to generate HTML list for institutions in each performance segment
 
     function generateInstitutionListHTML(rbd, agno_egreso, minPercentile, maxPercentile) {
@@ -1512,37 +1477,35 @@
         justify-content: center;
       }
 
-      .percentile-range {
+      .segment-header .percentile-range {
         font-size: 0.85em;
         color: #6c757d;
-        font-weight: 500;
-        letter-spacing: 0.3px;
+        font-weight: 400;
+        display: block;
+        margin-top: 4px;
       }
 
       .institutions-container {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        min-height: 200px;
+        min-height: 120px;
       }
 
       .institution-item {
-        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-        padding: 10px 12px;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 10px;
+        margin-bottom: 8px;
+        border-left: 3px solid #dee2e6;
         transition: all 0.2s ease;
       }
 
       .institution-item:hover {
-        background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
-        border-color: #2196f3;
-        transform: translateX(2px);
+        background: #e9ecef;
+        border-left-color: #6c757d;
       }
 
       .institution-name {
-        font-weight: 600;
-        color: #2c3e50;
+        font-weight: 500;
+        color: #495057;
         font-size: 0.9em;
         line-height: 1.3;
         margin-bottom: 4px;
@@ -1552,76 +1515,42 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 8px;
-      }
-
-      .institution-percentage {
-        font-weight: 700;
-        color: #27ae60;
-        font-size: 0.85em;
-        background: #e8f5e8;
-        padding: 2px 6px;
-        border-radius: 12px;
-        min-width: fit-content;
+        font-size: 0.8em;
+        color: #6c757d;
       }
 
       .institution-students {
-        font-size: 0.8em;
-        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .institution-percentage {
+        background: #e9ecef;
+        padding: 2px 6px;
+        border-radius: 10px;
         font-weight: 500;
       }
 
       .no-data {
         text-align: center;
-        padding: 20px;
         color: #6c757d;
-        background: #f8f9fa;
-        border-radius: 8px;
-        border: 2px dashed #dee2e6;
+        font-style: italic;
+        padding: 20px;
       }
 
       .no-data p {
         margin: 0 0 8px 0;
-        font-weight: 500;
         font-size: 0.9em;
       }
 
       .no-data small {
         font-size: 0.8em;
-        color: #868e96;
+        color: #adb5bd;
       }
 
-      .total-students-badge {
-        background: #e3f2fd;
-        color: #1976d2;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.8em;
-        font-weight: 600;
-        text-align: center;
-        margin-top: 8px;
-      }
-
-      /* Responsive design */
       @media (max-width: 768px) {
         .performance-segments {
           grid-template-columns: 1fr;
           gap: 12px;
-        }
-
-        .segment-column {
-          padding: 14px;
-        }
-
-        .institutions-container {
-          min-height: auto;
-        }
-      }
-
-      @media (max-width: 1024px) and (min-width: 769px) {
-        .performance-segments {
-          grid-template-columns: 1fr 1fr;
-          gap: 14px;
         }
       }
     </style>
