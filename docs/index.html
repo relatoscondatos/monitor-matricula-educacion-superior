@@ -1310,32 +1310,35 @@
 
       if (list.length === 0) {
         return html`
-          <div class="no-data">
-            <p>Ninguna institución concentra la mayoría de estudiantes</p>
-            <small>Total estudiantes: ${total}</small>
+          <div class="institutions-container">
+            <div class="no-data">
+              <p>Ninguna institución concentra la mayoría</p>
+              <small>Total estudiantes: ${total}</small>
+            </div>
           </div>
         `;
       }
 
-      // Build an array of DOM nodes (no .join!)
+      // Build an array of DOM nodes for institutions
       const items = list.map(inst => html`
         <div class="institution-item">
           <div class="institution-name">${inst.institution}</div>
-          <div class="institution-percentage">${Number(inst.percentage).toFixed(1)}%</div>
-          <div class="institution-students">${inst.students} estudiantes</div>
+          <div class="institution-stats">
+            <div class="institution-students">${inst.students} estudiantes</div>
+            <div class="institution-percentage">${Number(inst.percentage).toFixed(1)}%</div>
+          </div>
         </div>
       `);
 
       return html`
         <div class="institutions-container">
           ${items}
-          <div class="segment-total">
-            <strong>Total segmento: ${total} estudiantes</strong>
+          <div class="total-students-badge">
+            Total en rango: ${total} estudiantes
           </div>
         </div>
       `;
     }
-
   </script>
   <script id="25" type="module">
     function generateInstitutionSummaryMD(rbd, agno_egreso) {
@@ -1460,132 +1463,165 @@
       .performance-segments {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        gap: 20px;
+        gap: 16px;
         margin-top: 20px;
       }
 
       .segment-column {
         background: white;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border-top: 4px solid;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .segment-column:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
       }
 
       .segment-column.high-performance {
-        border-top-color: #27ae60;
+        border-top: 3px solid #27ae60;
       }
 
       .segment-column.medium-performance {
-        border-top-color: #f39c12;
+        border-top: 3px solid #f39c12;
       }
 
       .segment-column.low-performance {
-        border-top-color: #e74c3c;
+        border-top: 3px solid #e74c3c;
       }
 
       .segment-header {
         text-align: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #eee;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f1f3f4;
       }
 
       .segment-header h4 {
-        margin: 0 0 8px 0;
-        font-size: 1.1em;
+        margin: 0 0 4px 0;
+        font-size: 1.05em;
+        font-weight: 600;
         color: #2c3e50;
+        line-height: 1.3;
+        min-height: 2.6em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .percentile-range {
-        font-size: 0.9em;
-        color: #7f8c8d;
+        font-size: 0.85em;
+        color: #6c757d;
         font-weight: 500;
+        letter-spacing: 0.3px;
       }
 
       .institutions-container {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
+        min-height: 200px;
       }
 
       .institution-item {
-        background: #f8f9fa;
-        padding: 12px;
-        border-radius: 6px;
-        border-left: 3px solid #3498db;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
         transition: all 0.2s ease;
       }
 
       .institution-item:hover {
-        background: #e9ecef;
+        background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+        border-color: #2196f3;
         transform: translateX(2px);
       }
 
       .institution-name {
         font-weight: 600;
         color: #2c3e50;
-        margin-bottom: 4px;
-        font-size: 0.95em;
+        font-size: 0.9em;
         line-height: 1.3;
+        margin-bottom: 4px;
+      }
+
+      .institution-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
       }
 
       .institution-percentage {
-        font-size: 1.1em;
         font-weight: 700;
-        color: #3498db;
-        margin-bottom: 2px;
+        color: #27ae60;
+        font-size: 0.85em;
+        background: #e8f5e8;
+        padding: 2px 6px;
+        border-radius: 12px;
+        min-width: fit-content;
       }
 
       .institution-students {
-        font-size: 0.85em;
-        color: #7f8c8d;
-      }
-
-      .segment-total {
-        margin-top: 15px;
-        padding: 12px;
-        background: #e8f4f8;
-        border-radius: 6px;
-        text-align: center;
-        font-size: 0.9em;
-        color: #2c3e50;
+        font-size: 0.8em;
+        color: #6c757d;
+        font-weight: 500;
       }
 
       .no-data {
         text-align: center;
         padding: 20px;
-        color: #7f8c8d;
+        color: #6c757d;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 2px dashed #dee2e6;
       }
 
       .no-data p {
         margin: 0 0 8px 0;
-        font-style: italic;
+        font-weight: 500;
+        font-size: 0.9em;
       }
 
       .no-data small {
         font-size: 0.8em;
+        color: #868e96;
+      }
+
+      .total-students-badge {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-align: center;
+        margin-top: 8px;
       }
 
       /* Responsive design */
-      @media (max-width: 1024px) {
+      @media (max-width: 768px) {
         .performance-segments {
           grid-template-columns: 1fr;
-          gap: 15px;
+          gap: 12px;
         }
 
         .segment-column {
-          padding: 15px;
+          padding: 14px;
+        }
+
+        .institutions-container {
+          min-height: auto;
         }
       }
 
-      @media (max-width: 768px) {
-        .institution-name {
-          font-size: 0.9em;
-        }
-
-        .segment-header h4 {
-          font-size: 1em;
+      @media (max-width: 1024px) and (min-width: 769px) {
+        .performance-segments {
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
         }
       }
     </style>
