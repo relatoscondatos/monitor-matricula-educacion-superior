@@ -131,8 +131,8 @@
       width:900,
       height: 300,
       marginLeft:200,
-      title: `Distribución por Tramos de Rendimiento dentro del Establecimiento Escolar`,
-      subtitle: `${dictEstablecimientos[selectRBD].NOM_RBD} - Año ${selectAño}`,
+      title: `Distribución de matrícula en Educación superior según tramos de rendimiento dentro del establecimiento escolar`,
+      subtitle: `${dictEstablecimientos[selectRBD].NOM_RBD} - Egreso año ${selectAño}`,
 
       facet: {
         data: dataWithRanges,
@@ -263,7 +263,7 @@
     display(Plot.plot({
       width,
         title: `Distribución por posición de rendimiento dentro del colegio`,
-        subtitle: `${dictEstablecimientos[selectRBD].NOM_RBD} - Año ${selectAño}`,
+        subtitle: `${dictEstablecimientos[selectRBD].NOM_RBD} - Año egreso ${selectAño}`,
         x: {
             label: "Número de estudiantes"
         },
