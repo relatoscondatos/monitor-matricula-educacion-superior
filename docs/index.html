@@ -68,7 +68,7 @@
     const dataForChart = data_multiple_rbds.filter(d => d.rbd == selectRBD && d.agno_egreso == selectAño);
 
     function truncateLabel(label) {
-      const maxSize = 35;
+      const maxSize = 33;
       const newLabel = label.length > maxSize ? `${label.slice(0,maxSize-3)}...`: label;
       return newLabel
     }
@@ -110,8 +110,8 @@
       .map(d => d.institucion)
       .value();
 
-    display(Plot.plot({
-      width,
+    const chart = (Plot.plot({
+      width:900,
       height: 300,
       marginLeft:200,
       title: `Distribución por Rango de Rendimiento`,
@@ -173,6 +173,14 @@
         })
       ]
     }));
+
+    display(html`<div class="row">
+
+      <div class="card">
+      ${chart}
+      </div>
+    </div>`)
+
   </script>
   <script id="26" type="module">
     const summaryData = {
@@ -1776,7 +1784,7 @@
       }
     </style>
   </script>
-  <script id="33" type="text/markdown">
-    </div>
+  <script id="33" type="text/html">
+       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@observablehq/framework@latest/dist/framework.css">
   </script>
 </notebook>
