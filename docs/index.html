@@ -29,19 +29,6 @@
 
     </div>
   </script>
-  <script id="55" type="module" hidden="">
-    // Mapping function for school dependency types
-    function getDependenciaName(codDepe2) {
-      const dependenciaMap = {
-        1: "Municipal",
-        2: "Particular Subvencionado",
-        3: "Particular Pagado",
-        4: "Administración Delegada",
-        5: "Servicio Local"
-      };
-      return dependenciaMap[codDepe2] || "No especificado";
-    }
-  </script>
   <script id="17" type="text/x-typescript">
     const selectRBD = view(
       Inputs.select(
@@ -114,6 +101,74 @@
                 tip: true
             })
         ]
+    }));
+  </script>
+  <script id="57" type="module" pinned="">
+    // Faceted chart showing distribution by percentile ranges and institution
+    const dataForChart = data_multiple_rbds.filter(d => d.rbd == selectRBD && d.agno_egreso == selectAño);
+
+    // Create percentile ranges for faceting
+    const dataWithRanges = dataForChart.map(d => ({
+      ...d,
+      percentile_range: d.percentil <= 25 ? "Bajo (0-25)" :
+                       d.percentil <= 50 ? "Medio-Bajo (26-50)" :
+                       d.percentil <= 75 ? "Medio-Alto (51-75)" : "Alto (76-100)"
+    }));
+
+    // Get top 5 institutions overall for consistent coloring
+    const top5Institutions = _.chain(dataForChart)
+      .groupBy('nomb_inst')
+      .map((records, institution) => ({
+        institution,
+        total: _.sumBy(records, 'estudiantes')
+      }))
+      .orderBy('total', 'desc')
+      .take(5)
+      .map('institution')
+      .value();
+
+    display(Plot.plot({
+      width,
+      height: 600,
+      title: `Distribución por Percentil de Rendimiento - ${dictEstablecimientos[selectRBD].NOM_RBD} (${selectAño})`,
+
+      facet: {
+        data: dataWithRanges,
+        y: "percentile_range",
+        marginLeft: 120
+      },
+
+      x: {
+        label: "Número de estudiantes"
+      },
+
+      y: {
+        label: null,
+        axis: null
+      },
+
+      color: {
+        domain: [...top5Institutions, "Otras"],
+        range: [...d3.schemeCategory10.slice(0, top5Institutions.length), "lightgrey"],
+        legend: true
+      },
+
+      marks: [
+        Plot.barX(dataWithRanges, {
+          x: "estudiantes",
+          y: "nomb_inst",
+          fill: d => top5Institutions.includes(d.nomb_inst) ? d.nomb_inst : "Otras",
+          sort: {y: "x", reverse: true},
+          tip: {
+            channels: {
+              "Institución": "nomb_inst",
+              "Estudiantes": "estudiantes",
+              "Percentil": "percentil",
+              "Rango": "percentile_range"
+            }
+          }
+        })
+      ]
     }));
   </script>
   <script id="50" type="text/markdown">
@@ -249,20 +304,24 @@
     const establecimientosSeleccionados = [
     4,
     52,
+    580,
     1194,
     1515,
     2110,
     2200,
+    2786,
     2935,
     2973,
     3247,
     4163,
+    4798,
     4982,
     5084,
     5570,
     5654,
     5666,
     7329,
+    7406,
     8473,
     8485,
     8487,
@@ -300,6 +359,12 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/580/NEM_y_Percentil_Jovenes_580.parquet'
+      WHERE RBD = 580
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/1194/NEM_y_Percentil_Jovenes_1194.parquet'
       WHERE RBD = 1194
       )
@@ -324,6 +389,12 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2786/NEM_y_Percentil_Jovenes_2786.parquet'
+      WHERE RBD = 2786
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2935/NEM_y_Percentil_Jovenes_2935.parquet'
       WHERE RBD = 2935
       )
@@ -344,6 +415,12 @@
       (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4163/NEM_y_Percentil_Jovenes_4163.parquet'
       WHERE RBD = 4163
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4798/NEM_y_Percentil_Jovenes_4798.parquet'
+      WHERE RBD = 4798
       )
       UNION ALL
 
@@ -380,6 +457,12 @@
       (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/7329/NEM_y_Percentil_Jovenes_7329.parquet'
       WHERE RBD = 7329
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/7406/NEM_y_Percentil_Jovenes_7406.parquet'
+      WHERE RBD = 7406
       )
       UNION ALL
 
@@ -509,6 +592,11 @@
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/580/Matricula_Ed_Superior_580.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/1194/Matricula_Ed_Superior_1194.parquet')
 
       UNION ALL
@@ -529,6 +617,11 @@
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2786/Matricula_Ed_Superior_2786.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2935/Matricula_Ed_Superior_2935.parquet')
 
       UNION ALL
@@ -545,6 +638,11 @@
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4163/Matricula_Ed_Superior_4163.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/4798/Matricula_Ed_Superior_4798.parquet')
 
       UNION ALL
 
@@ -575,6 +673,11 @@
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/7329/Matricula_Ed_Superior_7329.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/7406/Matricula_Ed_Superior_7406.parquet')
 
       UNION ALL
 
@@ -794,7 +897,7 @@
       }
     });
 
-    //display(container);
+    display(container);
   </script>
   <script id="44" type="module">
     // Helper function to generate SQL UNION statements for multiple RBDs
@@ -1130,6 +1233,19 @@
     const dictEstablecimientos = {};
     [...establecimientos].forEach(d => dictEstablecimientos[d.RBD] = d);
 
+  </script>
+  <script id="55" type="module" hidden="">
+    // Mapping function for school dependency types
+    function getDependenciaName(codDepe2) {
+      const dependenciaMap = {
+        1: "Municipal",
+        2: "Particular Subvencionado",
+        3: "Particular Pagado",
+        4: "Administración Delegada",
+        5: "Servicio Local"
+      };
+      return dependenciaMap[codDepe2] || "No especificado";
+    }
   </script>
   <script id="29" type="text/html">
     <style>
