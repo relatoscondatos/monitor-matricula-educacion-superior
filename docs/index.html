@@ -18,7 +18,10 @@
     ---
 
     **Fuente de datos:** Datos Abiertos del Ministerio de Educación de Chile
-    **Última actualización:** Datos disponibles hasta 2023
+
+    **Última actualización:**
+    * Datos de egreso de Enseñanza Media disponibles hasta 2023
+    * Datos de Matrícula en Educación Superior disponibes hasta 2025
   </script>
   <script id="30" type="text/markdown">
     <div class="controls-section">
@@ -45,7 +48,7 @@
 
     const selectAño = view(
       Inputs.select(
-        _.range(2006, 2024, 1),
+        _.range(2005, 2024, 1),
         {
           label: "Año egreso Ens. Media:",
           value:2023
@@ -57,6 +60,162 @@
     ## Distribución de Estudiantes por Institución y Percentil de Rendimiento
 
     **${dictEstablecimientos[selectRBD].NOM_RBD}** | ${dictEstablecimientos[selectRBD].NOM_COM_RBD} | ${getDependenciaName(dictEstablecimientos[selectRBD].COD_DEPE2)} | Egreso ${selectAño}
+  </script>
+  <script id="57" type="module">
+    // Faceted chart showing distribution by percentile ranges and institution
+    const dataForChart = data_multiple_rbds.filter(d => d.rbd == selectRBD && d.agno_egreso == selectAño);
+
+    function truncateLabel(label) {
+      const maxSize = 35;
+      const newLabel = label.length > maxSize ? `${label.slice(0,maxSize-3)}...`: label;
+      return newLabel
+    }
+
+    const rangos = ["Mayor rendimiento (10-30)", "Rendimiento intermedio (40-70)", "Menor rendimiento (80-100)"]
+
+    // Create percentile ranges for faceting
+    const dataWithRanges_pre = dataForChart.map(d => ({
+      ...d,
+      percentile_range: d.percentil <= 30 ? rangos[0] :
+                       d.percentil <= 70 ? rangos[1]  : rangos[2] ,
+
+      institucion: d.ranking_inst <= 5 ? d.nomb_inst : "Otra institución",
+      //institucion:  d.nomb_inst ,
+      ranking_inst: d.ranking_inst,
+    }));
+
+    const dataWithRanges = _.chain(dataWithRanges_pre)
+      .groupBy(d => d.percentile_range)
+      .map((items,percentile_range) =>
+        _.chain(items)
+        .groupBy(d => d.institucion)
+        .map((subitems, institucion) => ({
+          percentile_range,
+          institucion,
+          estudiantes : _.reduce(subitems, (memo,d) => memo+d.estudiantes,0),
+          ranking_inst: subitems[0].ranking_inst
+        }))
+        .value()
+          )
+      .flatten()
+      .value()
+
+    // Get top 5 institutions overall for consistent coloring
+    const top5Institutions = _.chain(dataWithRanges)
+      .filter(d => d.ranking_inst <= 5)
+      .uniqBy(d => d.institucion)
+      .sortBy(d => d.ranking_inst)
+      .map(d => d.institucion)
+      .value();
+
+    display(Plot.plot({
+      width,
+      height: 300,
+      marginLeft:200,
+      title: `Distribución por Rango de Rendimiento`,
+      subtitle: `${dictEstablecimientos[selectRBD].NOM_RBD} - Año ${selectAño}`,
+
+      facet: {
+        data: dataWithRanges,
+        x: "percentile_range",
+        //marginLeft: 120
+      },
+
+      fx:{
+        domain: rangos,
+        label: "Rendimiento academico escolar (rango en percentil de egreso)"
+      },
+
+      x: {
+        label: "Número de estudiantes"
+      },
+
+      y: {
+        label: null,
+        domain: [...top5Institutions, "Otra institución"],
+        tickFormat: truncateLabel
+        //axis: null
+      },
+
+      color: {
+        domain: [...top5Institutions, "Otra institución"],
+        range: [...d3.schemeCategory10.slice(0, top5Institutions.length), "lightgrey"],
+        legend: true
+      },
+
+      marks: [
+        Plot.barX(dataWithRanges, {
+          x: "estudiantes",
+          y: d => d.ranking_inst <= 5 ? d.institucion :  "Otra institución",
+          fill: d => d.ranking_inst <= 5 ? d.institucion :  "Otra institución",
+          tip: {
+            channels: {
+              "Institución": "institucion",
+              "Rango": "percentile_range",
+              "Estudiantes": "estudiantes",
+            },
+            format: {
+              fill:false,
+              x:false,
+              y:false,
+              fx:false
+            }
+          }
+        }),
+        Plot.text(dataWithRanges, {
+          x: "estudiantes",
+          y: d => d.ranking_inst <= 5 ? d.institucion :  "Otra institución",
+          text: "estudiantes",
+          textAnchor:"start",
+          dx:2
+        })
+      ]
+    }));
+  </script>
+  <script id="60" type="text/html" pinned="">
+    ${htl.html(‘<h1>Hola</h1>')}
+  </script>
+  <script id="26" type="text/html">
+    <div class="summary-section">
+
+    ## Detalle por Segmentos de Rendimiento
+    ### Instituciones en que se matricula al menos el 66% de los estudiantes del segmento
+
+    **Establecimiento: ${dictEstablecimientos[selectRBD].NOM_RBD} (${dictEstablecimientos[selectRBD].NOM_COM_RBD}) - ${getDependenciaName(dictEstablecimientos[selectRBD].COD_DEPE2)} | RBD: ${selectRBD} | Año de Egreso: ${selectAño}**
+
+    <div class="performance-segments">
+      <div class="segment-column high-performance">
+        <div class="segment-header">
+          <h4>🏆 Mayor Rendimiento</h4>
+          <span class="percentile-range">Percentiles 10-30</span>
+        </div>
+        <div class="institutions-list">
+          ${htl.html`${generateInstitutionListHTML(selectRBD, selectAño, 10, 30)}`}
+        </div>
+      </div>
+
+      <div class="segment-column medium-performance">
+        <div class="segment-header">
+          <h4>📊 Rendimiento Intermedio</h4>
+          <span class="percentile-range">Percentiles 40-70</span>
+        </div>
+        <div class="institutions-list">
+          ${htl.html`${generateInstitutionListHTML(selectRBD, selectAño, 40, 70)}`}
+        </div>
+      </div>
+
+      <div class="segment-column low-performance">
+        <div class="segment-header">
+          <h4>📈 Menor Rendimiento</h4>
+          <span class="percentile-range">Percentiles 80-100</span>
+        </div>
+        <div class="institutions-list">
+          ${htl.html`${generateInstitutionListHTML(selectRBD, selectAño, 80, 100)}`}
+        </div>
+      </div>
+    </div>
+
+    </div>
   </script>
   <script id="14" type="text/x-typescript">
     const dataPlot = data_multiple_rbds.filter(d => d.rbd == selectRBD &&  d.agno_egreso == selectAño);
@@ -72,7 +231,8 @@
 
     display(Plot.plot({
       width,
-        title: `${dictEstablecimientos[selectRBD].NOM_RBD} - Año ${selectAño}`,
+        title: `Distribución por decil de rendimiento`,
+        subtitle: `${dictEstablecimientos[selectRBD].NOM_RBD} - Año ${selectAño}`,
         x: {
             label: "Número de estudiantes"
         },
@@ -103,74 +263,6 @@
         ]
     }));
   </script>
-  <script id="57" type="module" pinned="">
-    // Faceted chart showing distribution by percentile ranges and institution
-    const dataForChart = data_multiple_rbds.filter(d => d.rbd == selectRBD && d.agno_egreso == selectAño);
-
-    // Create percentile ranges for faceting
-    const dataWithRanges = dataForChart.map(d => ({
-      ...d,
-      percentile_range: d.percentil <= 25 ? "Bajo (0-25)" :
-                       d.percentil <= 50 ? "Medio-Bajo (26-50)" :
-                       d.percentil <= 75 ? "Medio-Alto (51-75)" : "Alto (76-100)"
-    }));
-
-    // Get top 5 institutions overall for consistent coloring
-    const top5Institutions = _.chain(dataForChart)
-      .groupBy('nomb_inst')
-      .map((records, institution) => ({
-        institution,
-        total: _.sumBy(records, 'estudiantes')
-      }))
-      .orderBy('total', 'desc')
-      .take(5)
-      .map('institution')
-      .value();
-
-    display(Plot.plot({
-      width,
-      height: 600,
-      title: `Distribución por Percentil de Rendimiento - ${dictEstablecimientos[selectRBD].NOM_RBD} (${selectAño})`,
-
-      facet: {
-        data: dataWithRanges,
-        y: "percentile_range",
-        marginLeft: 120
-      },
-
-      x: {
-        label: "Número de estudiantes"
-      },
-
-      y: {
-        label: null,
-        axis: null
-      },
-
-      color: {
-        domain: [...top5Institutions, "Otras"],
-        range: [...d3.schemeCategory10.slice(0, top5Institutions.length), "lightgrey"],
-        legend: true
-      },
-
-      marks: [
-        Plot.barX(dataWithRanges, {
-          x: "estudiantes",
-          y: "nomb_inst",
-          fill: d => top5Institutions.includes(d.nomb_inst) ? d.nomb_inst : "Otras",
-          sort: {y: "x", reverse: true},
-          tip: {
-            channels: {
-              "Institución": "nomb_inst",
-              "Estudiantes": "estudiantes",
-              "Percentil": "percentil",
-              "Rango": "percentile_range"
-            }
-          }
-        })
-      ]
-    }));
-  </script>
   <script id="50" type="text/markdown">
     ---
 
@@ -187,17 +279,6 @@
     - Concentración de estudiantes de alto rendimiento en ciertas instituciones
     - Distribución de preferencias según nivel de rendimiento académico
     - Diversidad institucional en diferentes segmentos de rendimiento
-  </script>
-  <script id="26" type="text/markdown">
-    <div class="summary-section">
-
-    ## Análisis por Segmentos de Rendimiento
-
-    **Establecimiento: ${dictEstablecimientos[selectRBD].NOM_RBD} (${dictEstablecimientos[selectRBD].NOM_COM_RBD}) - ${getDependenciaName(dictEstablecimientos[selectRBD].COD_DEPE2)} | RBD: ${selectRBD} | Año de Egreso: ${selectAño}**
-
-    ${generateInstitutionSummaryMD(selectRBD, selectAño)}
-
-    </div>
   </script>
   <script id="28" type="text/markdown">
     ---
@@ -304,6 +385,7 @@
     const establecimientosSeleccionados = [
     4,
     52,
+    257,
     580,
     1194,
     1515,
@@ -312,6 +394,7 @@
     2786,
     2935,
     2973,
+    3014,
     3247,
     4163,
     4798,
@@ -320,6 +403,7 @@
     5570,
     5654,
     5666,
+    5810,
     7329,
     7406,
     8473,
@@ -338,6 +422,7 @@
     8996,
     9046,
     9267,
+    12669,
     25369,
     25645,
     25654
@@ -355,6 +440,12 @@
       (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/52/NEM_y_Percentil_Jovenes_52.parquet'
       WHERE RBD = 52
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/257/NEM_y_Percentil_Jovenes_257.parquet'
+      WHERE RBD = 257
       )
       UNION ALL
 
@@ -407,6 +498,12 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/3014/NEM_y_Percentil_Jovenes_3014.parquet'
+      WHERE RBD = 3014
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/3247/NEM_y_Percentil_Jovenes_3247.parquet'
       WHERE RBD = 3247
       )
@@ -451,6 +548,12 @@
       (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5666/NEM_y_Percentil_Jovenes_5666.parquet'
       WHERE RBD = 5666
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5810/NEM_y_Percentil_Jovenes_5810.parquet'
+      WHERE RBD = 5810
       )
       UNION ALL
 
@@ -563,6 +666,12 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/12669/NEM_y_Percentil_Jovenes_12669.parquet'
+      WHERE RBD = 12669
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25369/NEM_y_Percentil_Jovenes_25369.parquet'
       WHERE RBD = 25369
       )
@@ -588,6 +697,11 @@
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/52/Matricula_Ed_Superior_52.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/257/Matricula_Ed_Superior_257.parquet')
 
       UNION ALL
 
@@ -632,6 +746,11 @@
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/3014/Matricula_Ed_Superior_3014.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/3247/Matricula_Ed_Superior_3247.parquet')
 
       UNION ALL
@@ -668,6 +787,11 @@
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5666/Matricula_Ed_Superior_5666.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/5810/Matricula_Ed_Superior_5810.parquet')
 
       UNION ALL
 
@@ -758,6 +882,11 @@
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/9267/Matricula_Ed_Superior_9267.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/12669/Matricula_Ed_Superior_12669.parquet')
 
       UNION ALL
 
@@ -897,9 +1026,9 @@
       }
     });
 
-    display(container);
+    //display(container);
   </script>
-  <script id="44" type="module">
+  <script id="44" type="module" hidden="">
     // Helper function to generate SQL UNION statements for multiple RBDs
     function generateUnionSQL(rbds, baseUrl = 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main') {
 
@@ -1129,6 +1258,37 @@
 
     //display(result);
   </script>
+  <script id="58" type="module" pinned="">
+    // Function to generate HTML list for institutions in each performance segment
+    function generateInstitutionListHTML(rbd, agno_egreso, minPercentile, maxPercentile) {
+      const data = getTopInstitutionsForLowPercentiles(rbd, agno_egreso, minPercentile, maxPercentile);
+
+      if (!data.majority_institutions || data.majority_institutions.length === 0) {
+        return `<div class="no-data">
+          <p>Ninguna institución concentra la mayoría de estudiantes</p>
+          <small>Total estudiantes: ${data.total_students_in_range}</small>
+        </div>`;
+      }
+
+      const institutionItems = data.majority_institutions
+        .map(inst => `
+          <div class="institution-item">
+            <div class="institution-name">${inst.institution}</div>
+            <div class="institution-percentage">${inst.percentage.toFixed(1)}%</div>
+            <div class="institution-students">${inst.students} estudiantes</div>
+          </div>
+        `).join('');
+
+      return `
+        <div class="institutions-container">
+          ${institutionItems}
+          <div class="segment-total">
+            <strong>Total segmento: ${data.total_students_in_range} estudiantes</strong>
+          </div>
+        </div>
+      `;
+    }
+  </script>
   <script id="25" type="module">
     function generateInstitutionSummaryMD(rbd, agno_egreso) {
       // Get data for different percentile ranges
@@ -1167,7 +1327,7 @@
 
     //display(institutionSummaryMD);
   </script>
-  <script id="22" type="module" hidden="">
+  <script id="22" type="module">
     // Create download button for CSV export
     const downloadButton = htl.html`<button style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
       Download CSV
@@ -1246,6 +1406,141 @@
       };
       return dependenciaMap[codDepe2] || "No especificado";
     }
+  </script>
+  <script id="59" type="text/html">
+    <style>
+      .performance-segments {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .segment-column {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-top: 4px solid;
+      }
+
+      .segment-column.high-performance {
+        border-top-color: #27ae60;
+      }
+
+      .segment-column.medium-performance {
+        border-top-color: #f39c12;
+      }
+
+      .segment-column.low-performance {
+        border-top-color: #e74c3c;
+      }
+
+      .segment-header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .segment-header h4 {
+        margin: 0 0 8px 0;
+        font-size: 1.1em;
+        color: #2c3e50;
+      }
+
+      .percentile-range {
+        font-size: 0.9em;
+        color: #7f8c8d;
+        font-weight: 500;
+      }
+
+      .institutions-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .institution-item {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        border-left: 3px solid #3498db;
+        transition: all 0.2s ease;
+      }
+
+      .institution-item:hover {
+        background: #e9ecef;
+        transform: translateX(2px);
+      }
+
+      .institution-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 4px;
+        font-size: 0.95em;
+        line-height: 1.3;
+      }
+
+      .institution-percentage {
+        font-size: 1.1em;
+        font-weight: 700;
+        color: #3498db;
+        margin-bottom: 2px;
+      }
+
+      .institution-students {
+        font-size: 0.85em;
+        color: #7f8c8d;
+      }
+
+      .segment-total {
+        margin-top: 15px;
+        padding: 12px;
+        background: #e8f4f8;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 0.9em;
+        color: #2c3e50;
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 20px;
+        color: #7f8c8d;
+      }
+
+      .no-data p {
+        margin: 0 0 8px 0;
+        font-style: italic;
+      }
+
+      .no-data small {
+        font-size: 0.8em;
+      }
+
+      /* Responsive design */
+      @media (max-width: 1024px) {
+        .performance-segments {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+
+        .segment-column {
+          padding: 15px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .institution-name {
+          font-size: 0.9em;
+        }
+
+        .segment-header h4 {
+          font-size: 1em;
+        }
+      }
+    </style>
   </script>
   <script id="29" type="text/html">
     <style>
