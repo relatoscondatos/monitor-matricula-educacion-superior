@@ -28,6 +28,8 @@
 
     ## Selección de Parámetros
 
+    Se incluye una selección de sobre 50 establecimientos de Educación Media que representan distintas dependencias y geografías.
+
     Utilice los controles a continuación para explorar los datos de diferentes establecimientos educacionales y años de egreso:
 
     </div>
@@ -37,7 +39,7 @@
       Inputs.select(
         _.sortBy([...new Set(data_multiple_rbds.map(d => d.rbd))], d => dictEstablecimientos[d].NOM_RBD),
         {
-          label: "RBD:",
+          label: "Establecimiento Escolar:",
           value: 8888,
           format: d => `${dictEstablecimientos[d].NOM_RBD} (${dictEstablecimientos[d].NOM_COM_RBD}) - ${getDependenciaName(dictEstablecimientos[d].COD_DEPE2)}`
         }
@@ -50,7 +52,7 @@
       Inputs.select(
         _.range(2005, 2024, 1),
         {
-          label: "Año egreso Ens. Media:",
+          label: "Año de egreso de Enseñanza Media:",
           value:2023
         }
       )
@@ -395,8 +397,10 @@
     580,
     1194,
     1515,
+    1757,
     2110,
     2200,
+    2454,
     2786,
     2935,
     2973,
@@ -428,10 +432,20 @@
     8996,
     9046,
     9267,
+    9959,
+    10832,
+    10892,
     12669,
+    16627,
+    17600,
+    17833,
+    24685,
     25369,
+    25439,
     25645,
-    25654
+    25654,
+    25999,
+    31327
     ]; // Add more RBDs as needed
   </script>
   <script id="12" type="application/sql" hidden="" database="duckdb" output="data_multiple_rbds">
@@ -474,6 +488,12 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/1757/NEM_y_Percentil_Jovenes_1757.parquet'
+      WHERE RBD = 1757
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2110/NEM_y_Percentil_Jovenes_2110.parquet'
       WHERE RBD = 2110
       )
@@ -482,6 +502,12 @@
       (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2200/NEM_y_Percentil_Jovenes_2200.parquet'
       WHERE RBD = 2200
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2454/NEM_y_Percentil_Jovenes_2454.parquet'
+      WHERE RBD = 2454
       )
       UNION ALL
 
@@ -672,14 +698,62 @@
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/9959/NEM_y_Percentil_Jovenes_9959.parquet'
+      WHERE RBD = 9959
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/10832/NEM_y_Percentil_Jovenes_10832.parquet'
+      WHERE RBD = 10832
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/10892/NEM_y_Percentil_Jovenes_10892.parquet'
+      WHERE RBD = 10892
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/12669/NEM_y_Percentil_Jovenes_12669.parquet'
       WHERE RBD = 12669
       )
       UNION ALL
 
       (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/16627/NEM_y_Percentil_Jovenes_16627.parquet'
+      WHERE RBD = 16627
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/17600/NEM_y_Percentil_Jovenes_17600.parquet'
+      WHERE RBD = 17600
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/17833/NEM_y_Percentil_Jovenes_17833.parquet'
+      WHERE RBD = 17833
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/24685/NEM_y_Percentil_Jovenes_24685.parquet'
+      WHERE RBD = 24685
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25369/NEM_y_Percentil_Jovenes_25369.parquet'
       WHERE RBD = 25369
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25439/NEM_y_Percentil_Jovenes_25439.parquet'
+      WHERE RBD = 25439
       )
       UNION ALL
 
@@ -692,6 +766,18 @@
       (SELECT mrun,rbd,agno_egreso,percentil
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25654/NEM_y_Percentil_Jovenes_25654.parquet'
       WHERE RBD = 25654
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25999/NEM_y_Percentil_Jovenes_25999.parquet'
+      WHERE RBD = 25999
+      )
+      UNION ALL
+
+      (SELECT mrun,rbd,agno_egreso,percentil
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/31327/NEM_y_Percentil_Jovenes_31327.parquet'
+      WHERE RBD = 31327
       )
     ),
 
@@ -727,12 +813,22 @@
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/1757/Matricula_Ed_Superior_1757.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2110/Matricula_Ed_Superior_2110.parquet')
 
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2200/Matricula_Ed_Superior_2200.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/2454/Matricula_Ed_Superior_2454.parquet')
 
       UNION ALL
 
@@ -892,12 +988,52 @@
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/9959/Matricula_Ed_Superior_9959.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/10832/Matricula_Ed_Superior_10832.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/10892/Matricula_Ed_Superior_10892.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/12669/Matricula_Ed_Superior_12669.parquet')
 
       UNION ALL
 
       (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/16627/Matricula_Ed_Superior_16627.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/17600/Matricula_Ed_Superior_17600.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/17833/Matricula_Ed_Superior_17833.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/24685/Matricula_Ed_Superior_24685.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25369/Matricula_Ed_Superior_25369.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25439/Matricula_Ed_Superior_25439.parquet')
 
       UNION ALL
 
@@ -908,6 +1044,16 @@
 
       (SELECT mrun,cat_periodo,nomb_inst
       FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25654/Matricula_Ed_Superior_25654.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/25999/Matricula_Ed_Superior_25999.parquet')
+
+      UNION ALL
+
+      (SELECT mrun,cat_periodo,nomb_inst
+      FROM 'https://raw.githubusercontent.com/elaval/Datos-por-RBD/main/31327/Matricula_Ed_Superior_31327.parquet')
     ),
 
     matriculas_con_percentil AS (
@@ -1299,7 +1445,7 @@
         <div class="institutions-container">
           ${items}
           <div class="total-students-badge">
-            Total en rango: ${total} estudiantes
+            <small>Total del segmento: ${total} estudiantes</small>
           </div>
         </div>
       `;
