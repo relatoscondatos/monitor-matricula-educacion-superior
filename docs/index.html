@@ -31,16 +31,25 @@
   </script>
   <script id="17" type="text/x-typescript">
     const options = _.sortBy([...new Set(data_multiple_rbds.map(d => d.rbd))], d => dictEstablecimientos[d].NOM_RBD);
+
     const selectRBD = view(
       Inputs.select(
         options,
         {
           label: "Establecimiento Escolar:",
-          value: _.sample(options),
-          format: d => `${dictEstablecimientos[d].NOM_RBD} (${dictEstablecimientos[d].NOM_COM_RBD}) - ${getDependenciaName(dictEstablecimientos[d].COD_DEPE2)}`
+          value: options.length > 0 ? _.sample(options) : null,
+          disabled: options.length === 0,
+          format: d => options.length === 0 ? "Cargando datos..." : `${dictEstablecimientos[d].NOM_RBD} (${dictEstablecimientos[d].NOM_COM_RBD}) - ${getDependenciaName(dictEstablecimientos[d].COD_DEPE2)}`
         }
       )
     );
+
+    // Show loading message when data is not ready
+    if (options.length === 0) {
+      display(html`<div style="padding: 10px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; color: #856404; margin: 10px 0;">
+        <strong>⏳ Cargando datos...</strong> Por favor espere mientras se cargan los datos de los establecimientos educacionales.
+      </div>`);
+    }
   </script>
   <script id="10" type="text/x-typescript">
 
@@ -56,8 +65,9 @@
   </script>
   <script id="31" type="text/markdown">
     ## Distribución de Estudiantes por Institución y Percentil de Rendimiento
-
-    **${dictEstablecimientos[selectRBD].NOM_RBD}** | ${dictEstablecimientos[selectRBD].NOM_COM_RBD} | ${getDependenciaName(dictEstablecimientos[selectRBD].COD_DEPE2)} | Egreso ${selectAño}
+    ${selectRBD && dictEstablecimientos[selectRBD] ?
+      `**${dictEstablecimientos[selectRBD].NOM_RBD}** | ${dictEstablecimientos[selectRBD].NOM_COM_RBD} | ${getDependenciaName(dictEstablecimientos[selectRBD].COD_DEPE2)} | Egreso ${selectAño}` :
+      ''}
   </script>
   <script id="57" type="module">
     // Faceted chart showing distribution by percentile ranges and institution
