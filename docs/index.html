@@ -4,24 +4,19 @@
   <script id="1" type="text/markdown">
     # Análisis de Trayectorias Educativas: Distribución de Estudiantes por Institución según Rendimiento Escolar
     **Ernesto Laval** ([@elaval](https://x.com/elaval))
+
     ## Descripción
 
     Este análisis examina las decisiones de educación superior de estudiantes egresados de establecimientos de educación media, considerando su perfil de rendimiento académico (percentil de rendimiento escolar).
-
-    El estudio busca identificar patrones más complejos que van más allá de asociaciones generales entre colegios y universidades específicas, revelando cómo el rendimiento académico influye en las elecciones institucionales y cómo estos patrones pueden evolucionar en el tiempo.
 
     ### Objetivos del análisis:
     - Identificar las instituciones de educación superior preferidas por estudiantes según su percentil de rendimiento
     - Analizar la estabilidad o variación de estos patrones a lo largo del tiempo
     - Proporcionar evidencia empírica sobre las trayectorias educativas en Chile
 
-    ---
-
     **Fuente de datos:** Datos Abiertos del Ministerio de Educación de Chile
 
-    **Última actualización:**
-    * Datos de egreso de Enseñanza Media disponibles hasta 2023
-    * Datos de Matrícula en Educación Superior disponibes hasta 2025
+    ---
   </script>
   <script id="30" type="text/markdown">
     <div class="controls-section">
@@ -35,12 +30,13 @@
     </div>
   </script>
   <script id="17" type="text/x-typescript">
+    const options = _.sortBy([...new Set(data_multiple_rbds.map(d => d.rbd))], d => dictEstablecimientos[d].NOM_RBD);
     const selectRBD = view(
       Inputs.select(
-        _.sortBy([...new Set(data_multiple_rbds.map(d => d.rbd))], d => dictEstablecimientos[d].NOM_RBD),
+        options,
         {
           label: "Establecimiento Escolar:",
-          value: 8888,
+          value: _.sample(options),
           format: d => `${dictEstablecimientos[d].NOM_RBD} (${dictEstablecimientos[d].NOM_COM_RBD}) - ${getDependenciaName(dictEstablecimientos[d].COD_DEPE2)}`
         }
       )
@@ -284,17 +280,15 @@
 
     ### Interpretación del Gráfico
 
-    El gráfico anterior muestra la distribución de estudiantes según su percentil de rendimiento escolar y las instituciones de educación superior que seleccionaron.
-
     **Cómo leer el gráfico:**
-    - **Eje X (horizontal)**: Número de estudiantes
-    - **Eje Y (vertical)**: Percentil de rendimiento escolar (0-100, donde 100 representa el mejor rendimiento)
-    - **Colores**: Las instituciones se agrupan destacando las 5 principales por cantidad de estudiantes, mientras que el resto se agrupa en la categoría "otras"
+    - **Eje X**: Número de estudiantes
+    - **Eje Y**: Percentil de rendimiento escolar (0-100, donde valores menores indican mejor rendimiento)
+    - **Colores**: Se destacan las 5 instituciones principales por cantidad de estudiantes
 
-    **Patrones a observar:**
-    - Concentración de estudiantes de alto rendimiento en ciertas instituciones
-    - Distribución de preferencias según nivel de rendimiento académico
-    - Diversidad institucional en diferentes segmentos de rendimiento
+    **Patrones clave a observar:**
+    - Concentración de estudiantes de alto rendimiento (percentiles bajos) en ciertas instituciones
+    - Distribución de preferencias institucionales según nivel académico
+    - Diversidad de opciones en diferentes segmentos de rendimiento
   </script>
   <script id="28" type="text/markdown">
     ---
@@ -302,97 +296,31 @@
     ## Aspectos Técnicos y Metodológicos
 
     ### Fuentes de Datos
+    Los datos provienen de los **Datos Abiertos del Ministerio de Educación de Chile**:
+    - Rendimiento Escolar (NEM y Percentil) (2004 a 2023)
+    - Registros de Matrícula Escolar (2004-2024)
+    - Matrícula en Educación Superior hasta (2007 a 2025)
 
-    Los datos utilizados en este análisis provienen de los **Datos Abiertos del Ministerio de Educación de Chile**, específicamente:
+    ### Metodología
+    1. **Identificación de estudiantes**: Revisión de registros históricos de matrícula por establecimiento
+    2. **Cálculo de percentiles**: Ordenamiento de estudiantes egresados de Ed. Media por rendimiento académico (NEM)
+    3. **Seguimiento de trayectorias**: Vinculación con registros de educación superior
+    4. **Selección de institución**: Cuando un estudiante tiene múltiples registros de matrícula en educación superior, se considera la **primera institución** que aparece cronológicamente en los registros (ordenado por período de matrícula)
+    5. **Análisis de patrones**: Identificación de instituciones preferidas por segmento de rendimiento
 
-    1. **Datos de Rendimiento Escolar (NEM y Percentil)**: Información sobre el rendimiento académico de estudiantes egresados de educación media hasta 2023
-    2. **Registros Históricos de Matrícula Escolar**: Datos de matrícula en establecimientos educacionales (2004-2024)
-    3. **Datos de Matrícula en Educación Superior**: Registros de matrícula de estudiantes en instituciones de educación superior
+    ### Consideraciones Importantes
+    - **Percentiles de rendimiento**: Valores menores indican mejor rendimiento (percentil 10 = top 10%)
+    - **Cobertura temporal**: Uso de datos desde 2005 hasta 2023 para el año de egreso de Ed Media.
+    - **Muestra**: Más de 50 establecimientos representativos de diferentes dependencias y regiones
+    - **Limitaciones**: Solo incluye estudiantes que efectivamente se matricularon en educación superior
+    - **Criterio de institución**: Se asigna la primera institución de educación superior en la que se matriculó el estudiante, lo que puede representar su primera opción o decisión inicial
 
-    ### Procesamiento General de Datos
+    ### Definición de Segmentos
+    - **Mayor rendimiento**: Percentiles 10-30 (mejor 30% de estudiantes)
+    - **Rendimiento intermedio**: Percentiles 40-70
+    - **Menor rendimiento**: Percentiles 80-100 (20% con menor rendimiento)
 
-    #### 1. Extracción y Preprocesamiento
-    - **Extracción**: Se obtienen los archivos del repositorio de datos abiertos del MINEDUC para todos los años disponibles
-    - **Identificación de estudiantes**: Se identifican estudiantes que han estado matriculados en cada establecimiento mediante revisión de registros históricos de matrícula (2004-2024)
-    - **Creación de bases reducidas**: Para cada establecimiento se genera una base de datos histórica que incluye:
-      - Matrícula escolar
-      - Egreso de enseñanza media
-      - Matrícula en educación superior
-      - Asistencia anual
-      - Clasificación SEP (estudiantes prioritarios y preferentes)
-
-    #### 2. Almacenamiento
-    - Los datos procesados se almacenan por establecimiento en formato Parquet
-    - Se mantienen en repositorio GitHub para facilitar consultas específicas posteriores
-
-    ### Procesamiento Específico para este Análisis
-
-    #### 1. Identificación de Trayectorias Educativas
-    - Para cada estudiante egresado de enseñanza media del establecimiento analizado, se identifica la **primera institución de educación superior** en la que se matriculó
-    - Esta primera matrícula se considera como la decisión educativa principal del estudiante
-
-    #### 2. Construcción de la Tabla de Análisis
-    Se genera una tabla agregada que contiene:
-    - **Año de egreso** de enseñanza media
-    - **Percentil de rendimiento** del estudiante
-    - **Institución de educación superior** (primera matrícula)
-    - **Número de estudiantes** por cada combinación de las variables anteriores
-
-    ### Variables Principales
-
-    - **RBD (Rol Base de Datos)**: Identificador único del establecimiento educacional
-    - **Año de Egreso**: Año de egreso de educación media
-    - **Percentil de Rendimiento**: Posición relativa del estudiante dentro de su cohorte del mismo establecimiento (0-100). Este indicador se calcula a partir del ranking de notas obtenido por cada estudiante dentro de su propio establecimiento, mostrando su posición relativa en comparación con sus compañeros de generación del mismo colegio, sin establecer comparaciones entre distintos establecimientos
-    - **Institución de Educación Superior**: Primera institución donde el estudiante se matriculó tras egresar de enseñanza media
-
-    ### Criterios de Visualización y Análisis
-
-    #### Gráfico de Distribución por Percentiles
-    - **Destacado de instituciones**: Se identifican las **5 instituciones con mayor número total de estudiantes** para el establecimiento y año seleccionado, considerando todos los percentiles de rendimiento
-    - **Agrupación**: Las instituciones que no están entre las 5 principales se agrupan en la categoría "otras" para simplificar la visualización
-    - **Ordenamiento**: Las instituciones se ordenan por su ranking total de estudiantes recibidos
-
-    #### Análisis por Segmentos de Rendimiento
-    Para el análisis por rangos de percentiles se aplican los siguientes criterios:
-
-    - **Segmento Superior** (percentiles 10-30): Estudiantes con mejor rendimiento relativo
-    - **Segmento Intermedio** (percentiles 40-70): Estudiantes con rendimiento medio
-    - **Segmento Inferior** (percentiles 80-100): Estudiantes con menor rendimiento relativo
-
-    **Criterio de identificación de instituciones principales por segmento:**
-    - Se identifican las instituciones de educación superior que, en conjunto, **concentran al menos el 60% de los estudiantes** de cada segmento de rendimiento
-    - Este umbral permite identificar las instituciones más relevantes para cada grupo, destacando patrones de concentración institucional según el rendimiento académico
-    - Las instituciones se ordenan por cantidad de estudiantes dentro de cada segmento hasta alcanzar o superar el 60% del total
-
-    ### Consideraciones Metodológicas
-
-    #### Decisiones de Procesamiento
-    - **Primera matrícula**: Se considera únicamente la primera institución de educación superior donde se matriculó cada estudiante, asumiendo que representa su decisión educativa principal
-    - **Percentil intra-establecimiento**: Los percentiles se calculan dentro de cada establecimiento, permitiendo comparaciones internas pero no entre colegios diferentes
-
-    #### Agregación de Datos
-    - Las instituciones se clasifican y priorizan según la cantidad de estudiantes que reciben de cada establecimiento
-    - Se destacan las 5 instituciones principales por año, agrupando el resto en la categoría "otras"
-
-    ### Limitaciones
-
-    - **Cobertura**: El análisis considera únicamente estudiantes que efectivamente se matricularon en educación superior
-    - **Temporalidad**: Los datos de egreso están disponibles hasta 2023
-    - **Variables no consideradas**: No se incluyen variables socioeconómicas adicionales que podrían influir en las decisiones educativas
-    - **Alcance institucional**: La información se limita a instituciones formalmente reconocidas en el sistema educativo chileno
-    - **Trayectorias múltiples**: No se consideran cambios de institución posteriores a la primera matrícula
-
-    ### Reproducibilidad
-
-    Los datos procesados y el código de análisis están disponibles públicamente, permitiendo la replicación y extensión de este estudio para otros establecimientos educacionales.
-
-    ---
-
-    ## Autor
-
-    **Ernesto Laval** ([@elaval](https://x.com/elaval))
-
-    ---
+    Los análisis se enfocan en instituciones que concentran al menos el 66% de estudiantes en cada segmento.
   </script>
   <script id="48" type="text/x-typescript" hidden="">
     _.sortBy(establecimientosSeleccionados, d => d).map(d => d).join(",\n")
