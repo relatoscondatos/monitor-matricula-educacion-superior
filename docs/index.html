@@ -7,12 +7,22 @@
 
     ## Descripción
 
-    Este análisis examina las decisiones de educación superior de estudiantes egresados de establecimientos de educación media, considerando su perfil de rendimiento académico (percentil de rendimiento escolar).
+    Este análisis examina las decisiones de educación superior de estudiantes egresados de establecimientos de educación media, considerando su rendimiento académico relativo dentro de su propia promoción.
 
     ### Objetivos del análisis:
-    - Identificar las instituciones de educación superior preferidas por estudiantes según su percentil de rendimiento
+    - Identificar las instituciones de educación superior preferidas por estudiantes según su rendimiento relativo en el colegio
     - Analizar la estabilidad o variación de estos patrones a lo largo del tiempo
     - Proporcionar evidencia empírica sobre las trayectorias educativas en Chile
+
+    ### Metodología de agrupamiento:
+    El Mineduc calcula, para cada colegio y generación, la posición relativa de cada estudiante según sus notas de enseñanza media.
+
+    Para facilitar la lectura, agrupamos a los estudiantes en tres tramos dentro de su propia promoción:
+    - **Mayor rendimiento** (30% con mejores notas)
+    - **Rendimiento intermedio** (40% central)
+    - **Menor rendimiento** (30% con menores notas)
+
+    **Importante:** La comparación es dentro del mismo colegio y año, no entre colegios distintos.
 
     **Fuente de datos:** Datos Abiertos del Ministerio de Educación de Chile
 
@@ -64,13 +74,15 @@
     );
   </script>
   <script id="31" type="text/markdown">
-    ## Distribución de Estudiantes por Institución y Percentil de Rendimiento
+    ## Distribución de Estudiantes por Institución y Tramo de Rendimiento
     ${selectRBD && dictEstablecimientos[selectRBD] ?
       `**${dictEstablecimientos[selectRBD].NOM_RBD}** | ${dictEstablecimientos[selectRBD].NOM_COM_RBD} | ${getDependenciaName(dictEstablecimientos[selectRBD].COD_DEPE2)} | Egreso ${selectAño}` :
       ''}
+
+    *Tramos dentro de cada colegio y generación: Mayor (30% superior), Intermedio (40% central), Menor (30% inferior)*
   </script>
   <script id="57" type="module">
-    // Faceted chart showing distribution by percentile ranges and institution
+    // Faceted chart showing distribution by performance ranges and institution
     const dataForChart = data_multiple_rbds.filter(d => d.rbd == selectRBD && d.agno_egreso == selectAño);
 
     function truncateLabel(label) {
@@ -79,26 +91,25 @@
       return newLabel
     }
 
-    const rangos = ["Mayor rendimiento (10-30)", "Rendimiento intermedio (40-70)", "Menor rendimiento (80-100)"]
+    const rangos = ["Mayor rendimiento (30% superior)", "Rendimiento intermedio (40% central)", "Menor rendimiento (30% inferior)"]
 
-    // Create percentile ranges for faceting
+    // Create performance ranges for faceting
     const dataWithRanges_pre = dataForChart.map(d => ({
       ...d,
-      percentile_range: d.percentil <= 30 ? rangos[0] :
-                       d.percentil <= 70 ? rangos[1]  : rangos[2] ,
+      performance_range: d.percentil <= 30 ? rangos[0] :
+                        d.percentil <= 70 ? rangos[1] : rangos[2],
 
       institucion: d.ranking_inst <= 5 ? d.nomb_inst : "Otra institución",
-      //institucion:  d.nomb_inst ,
       ranking_inst: d.ranking_inst,
     }));
 
     const dataWithRanges = _.chain(dataWithRanges_pre)
-      .groupBy(d => d.percentile_range)
-      .map((items,percentile_range) =>
+      .groupBy(d => d.performance_range)
+      .map((items, performance_range) =>
         _.chain(items)
         .groupBy(d => d.institucion)
         .map((subitems, institucion) => ({
-          percentile_range,
+          performance_range,
           institucion,
           estudiantes : _.reduce(subitems, (memo,d) => memo+d.estudiantes,0),
           ranking_inst: subitems[0].ranking_inst
@@ -120,18 +131,17 @@
       width:900,
       height: 300,
       marginLeft:200,
-      title: `Distribución por Rango de Rendimiento`,
+      title: `Distribución por Tramos de Rendimiento dentro del Colegio`,
       subtitle: `${dictEstablecimientos[selectRBD].NOM_RBD} - Año ${selectAño}`,
 
       facet: {
         data: dataWithRanges,
-        x: "percentile_range",
-        //marginLeft: 120
+        x: "performance_range",
       },
 
       fx:{
         domain: rangos,
-        label: "Rendimiento academico escolar (rango en percentil de egreso)"
+        label: "Tramos de rendimiento (posición dentro de la promoción)"
       },
 
       x: {
@@ -142,7 +152,6 @@
         label: null,
         domain: [...top5Institutions, "Otra institución"],
         tickFormat: truncateLabel
-        //axis: null
       },
 
       color: {
@@ -159,7 +168,7 @@
           tip: {
             channels: {
               "Institución": "institucion",
-              "Rango": "percentile_range",
+              "Tramo": "performance_range",
               "Estudiantes": "estudiantes",
             },
             format: {
@@ -181,12 +190,10 @@
     }));
 
     display(html`<div class="row">
-
       <div class="card">
       ${chart}
       </div>
     </div>`)
-
   </script>
   <script id="26" type="module">
     const summaryData = {
@@ -197,11 +204,10 @@
       dependencia: getDependenciaName(dictEstablecimientos[selectRBD].COD_DEPE2)
     };
 
-
     display(html`<div class="summary-section">
 
-    <h2>Detalle por Segmentos de Rendimiento</h2>
-    <h3>Instituciones en que se matricula al menos el 66% de los estudiantes del segmento</h3>
+    <h2>Detalle por Tramos de Rendimiento</h2>
+    <h3>Instituciones en que se matricula al menos el 66% de los estudiantes del tramo</h3>
 
     <p><strong>Establecimiento: ${summaryData.establecimiento} (${summaryData.comuna}) - ${summaryData.dependencia} | RBD: ${summaryData.rbd} | Año de Egreso: ${summaryData.año}</strong></p>
 
@@ -209,7 +215,7 @@
       <div class="segment-column high-performance">
         <div class="segment-header">
           <h4>Mayor Rendimiento</h4>
-          <span class="percentile-range">Percentiles 10-30</span>
+          <span class="performance-range">30% superior</span>
         </div>
         <div class="institutions-list">
           ${htl.html`${generateInstitutionListHTML(summaryData.rbd, summaryData.año, 10, 30)}`}
@@ -219,7 +225,7 @@
       <div class="segment-column medium-performance">
         <div class="segment-header">
           <h4>Rendimiento Intermedio</h4>
-          <span class="percentile-range">Percentiles 40-70</span>
+          <span class="performance-range">40% central</span>
         </div>
         <div class="institutions-list">
           ${htl.html`${generateInstitutionListHTML(summaryData.rbd, summaryData.año, 40, 70)}`}
@@ -229,7 +235,7 @@
       <div class="segment-column low-performance">
         <div class="segment-header">
           <h4>Menor Rendimiento</h4>
-          <span class="percentile-range">Percentiles 80-100</span>
+          <span class="performance-range">30% inferior</span>
         </div>
         <div class="institutions-list">
           ${htl.html`${generateInstitutionListHTML(summaryData.rbd, summaryData.año, 80, 100)}`}
@@ -237,7 +243,7 @@
       </div>
     </div>
 
-    </div>`);
+    </div>`)
   </script>
   <script id="14" type="text/x-typescript">
     const dataPlot = data_multiple_rbds.filter(d => d.rbd == selectRBD &&  d.agno_egreso == selectAño);
@@ -250,16 +256,15 @@
         .map('nomb_inst')
         .value();
 
-
     display(Plot.plot({
       width,
-        title: `Distribución por decil de rendimiento`,
+        title: `Distribución por posición de rendimiento dentro del colegio`,
         subtitle: `${dictEstablecimientos[selectRBD].NOM_RBD} - Año ${selectAño}`,
         x: {
             label: "Número de estudiantes"
         },
         y: {
-            label: "Percentil de rendimiento escolar"
+            label: "Posición de rendimiento (1=mejor, 100=menor rendimiento)"
         },
         color: {
             domain: _.concat(top5, "otras"),
@@ -275,15 +280,21 @@
                 y: (d) => +d["percentil"],
                 fill: (d) => (d.ranking_inst <= 5) ? d.nomb_inst : "otras",
                 sort: {z:"x"},
-            channels: {
-                    "Institución": "nomb_inst",
-                    "Estudiantes": "estudiantes",
-                    "Percentil": "percentil"
+                channels: {
+                    "Institución": (d) => (d.ranking_inst <= 5) ? d.nomb_inst : "otras",
+                    "Posición": (d) => +d["percentil"],
+                    "Estudiantes": "estudiantes"
                 },
-                tip: true
+                tip: {
+                    format: {
+                        fill: false,
+                        y: false,
+                        x: false
+                    }
+                }
             })
         ]
-    }));
+    }))
   </script>
   <script id="50" type="text/markdown">
     ---
@@ -292,13 +303,15 @@
 
     **Cómo leer el gráfico:**
     - **Eje X**: Número de estudiantes
-    - **Eje Y**: Percentil de rendimiento escolar (0-100, donde valores menores indican mejor rendimiento)
+    - **Eje Y**: Posición de rendimiento dentro del colegio (1-100, donde 1 indica el mejor rendimiento y 100 el menor)
     - **Colores**: Se destacan las 5 instituciones principales por cantidad de estudiantes
 
     **Patrones clave a observar:**
-    - Concentración de estudiantes de alto rendimiento (percentiles bajos) en ciertas instituciones
-    - Distribución de preferencias institucionales según nivel académico
+    - Concentración de estudiantes de mayor rendimiento (posiciones 1-30) en ciertas instituciones
+    - Distribución de preferencias institucionales según tramo de rendimiento
     - Diversidad de opciones en diferentes segmentos de rendimiento
+
+    **Nota importante**: La comparación de rendimiento es siempre dentro del mismo colegio y generación, no entre colegios distintos.
   </script>
   <script id="28" type="text/markdown">
     ---
@@ -307,30 +320,32 @@
 
     ### Fuentes de Datos
     Los datos provienen de los **Datos Abiertos del Ministerio de Educación de Chile**:
-    - Rendimiento Escolar (NEM y Percentil) (2004 a 2023)
+    - Rendimiento Escolar (NEM y posición relativa) (2004 a 2023)
     - Registros de Matrícula Escolar (2004-2024)
     - Matrícula en Educación Superior hasta (2007 a 2025)
 
     ### Metodología
     1. **Identificación de estudiantes**: Revisión de registros históricos de matrícula por establecimiento
-    2. **Cálculo de percentiles**: Ordenamiento de estudiantes egresados de Ed. Media por rendimiento académico (NEM)
-    3. **Seguimiento de trayectorias**: Vinculación con registros de educación superior
-    4. **Selección de institución**: Cuando un estudiante tiene múltiples registros de matrícula en educación superior, se considera la **primera institución** que aparece cronológicamente en los registros (ordenado por período de matrícula)
-    5. **Análisis de patrones**: Identificación de instituciones preferidas por segmento de rendimiento
+    2. **Cálculo de posición relativa**: El Mineduc ordena a los estudiantes egresados de cada colegio por rendimiento académico (NEM)
+    3. **Agrupamiento en tramos**: División en tres grupos dentro de cada promoción:
+       - Mayor rendimiento: 30% con mejores notas
+       - Rendimiento intermedio: 40% central
+       - Menor rendimiento: 30% con menores notas
+    4. **Seguimiento de trayectorias**: Vinculación con registros de educación superior
+    5. **Selección de institución**: Cuando un estudiante tiene múltiples registros de matrícula en educación superior, se considera la **primera institución** que aparece cronológicamente en los registros (ordenado por período de matrícula)
+    6. **Análisis de patrones**: Identificación de instituciones preferidas por tramo de rendimiento
 
     ### Consideraciones Importantes
-    - **Percentiles de rendimiento**: Valores menores indican mejor rendimiento (percentil 10 = top 10%)
-    - **Cobertura temporal**: Uso de datos desde 2005 hasta 2023 para el año de egreso de Ed Media.
-    - **Muestra**: Más de 50 establecimientos representativos de diferentes dependencias y regiones
-    - **Limitaciones**: Solo incluye estudiantes que efectivamente se matricularon en educación superior
-    - **Criterio de institución**: Se asigna la primera institución de educación superior en la que se matriculó el estudiante, lo que puede representar su primera opción o decisión inicial
+    - **Comparación interna**: El rendimiento se compara únicamente dentro del mismo colegio y año de egreso, no entre diferentes establecimientos
+    - **Representatividad**: Los datos incluyen una muestra de más de 50 establecimientos que representan distintas dependencias y geografías
+    - **Período de análisis**: Datos disponibles desde 2005 hasta 2023 para egreso de enseñanza media
+    - **Limitaciones**: No se consideran factores socioeconómicos, geográficos o de acceso que pueden influir en las decisiones educativas
+    - **Interpretación**: Los patrones observados reflejan tanto preferencias estudiantiles como políticas de admisión institucionales
 
-    ### Definición de Segmentos
-    - **Mayor rendimiento**: Percentiles 10-30 (mejor 30% de estudiantes)
-    - **Rendimiento intermedio**: Percentiles 40-70
-    - **Menor rendimiento**: Percentiles 80-100 (20% con menor rendimiento)
-
-    Los análisis se enfocan en instituciones que concentran al menos el 66% de estudiantes en cada segmento.
+    ### Definiciones Técnicas
+    - **Posición relativa**: Indicador calculado por el Mineduc que ubica a cada estudiante dentro de su promoción según sus notas de enseñanza media
+    - **Tramos de rendimiento**: Agrupación simplificada de la posición relativa en tres categorías para facilitar el análisis
+    - **Primera matrícula**: Criterio de selección cuando un estudiante aparece en múltiples instituciones de educación superior
   </script>
   <script id="48" type="text/x-typescript" hidden="">
     _.sortBy(establecimientosSeleccionados, d => d).map(d => d).join(",\n")
@@ -1515,7 +1530,7 @@
       return dependenciaMap[codDepe2] || "No especificado";
     }
   </script>
-  <script id="59" type="text/html">
+  <script id="29" type="text/html">
     <style>
       .performance-segments {
         display: grid;
@@ -1647,7 +1662,7 @@
       }
     </style>
   </script>
-  <script id="29" type="text/html">
+  <script id="82" type="text/html">
     <style>
       .notebook-container {
         max-width: 1200px;
@@ -1721,8 +1736,5 @@
         margin: 40px 0;
       }
     </style>
-  </script>
-  <script id="33" type="text/html">
-       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@observablehq/framework@latest/dist/framework.css">
   </script>
 </notebook>
