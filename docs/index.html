@@ -131,7 +131,7 @@
       width:900,
       height: 300,
       marginLeft:200,
-      title: `Distribución por Tramos de Rendimiento dentro del Colegio`,
+      title: `Distribución por Tramos de Rendimiento dentro del Establecimiento Escolar`,
       subtitle: `${dictEstablecimientos[selectRBD].NOM_RBD} - Año ${selectAño}`,
 
       facet: {
@@ -241,6 +241,10 @@
           ${htl.html`${generateInstitutionListHTML(summaryData.rbd, summaryData.año, 80, 100)}`}
         </div>
       </div>
+    </div>
+
+    <div class="footnote">
+      <p><small><strong>Nota:</strong> Los estudiantes pueden tener matrícula en múltiples instituciones de educación superior. Este análisis se enfoca únicamente en aquellas instituciones que concentran al menos el 66% de la matrícula de cada tramo de rendimiento, destacando las preferencias institucionales más significativas.</small></p>
     </div>
 
     </div>`)
