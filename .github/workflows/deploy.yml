@@ -1,3 +1,4 @@
+# .github/workflows/deploy.yml
 name: Deploy to GitHub Pages
 
 on:
@@ -18,6 +19,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # ensure duckdb knows where to put/get extensions (writable, cacheable)
+      DUCKDB_EXTENSION_DIRECTORY: ${{ github.workspace }}/.duckdb-extensions
+      # allow extension install during SSR if needed
+      DUCKDB_ALLOW_EXTENSIONS: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,12 +32,32 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+
+      - name: Cache DuckDB extensions
+        uses: actions/cache@v4
+        with:
+          path: .duckdb-extensions
+          key: duckdb-ext-${{ runner.os }}-1.3.2
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Build site
-        run: npm run docs:build
+      - name: Preinstall DuckDB httpfs
+        run: npm run prebuild:site
+
+      - name: Build site (capture log)
+        run: |
+          set -o pipefail
+          npm run build:site 2>&1 | tee build.log
+
+      # Optional: fail if build contained the autoload error string
+      - name: Fail on DuckDB autoload error
+        run: |
+          if grep -q "Extension Autoloading Error" build.log; then
+            echo "Detected DuckDB autoload error; failing build."
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
